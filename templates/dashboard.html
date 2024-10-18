@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Device Dashboard</h1>
+
+    <div>
+        <h2>Live Sensor Data</h2>
+
+        <!-- Air Quality -->
+        <h3>Air Quality</h3>
+        <p id="air-quality">Loading...</p>
+
+        <!-- Temperature -->
+        <h3>Temperature</h3>
+        <p id="temperature">Loading...</p>
+
+        <!-- Button to trigger data update -->
+        <button id="update-data">Update Data</button>
+    </div>
+
+    <script>
+        // Example JavaScript to fetch and display live data
+        document.getElementById('update-data').addEventListener('click', function() {
+            fetch('/api/sensor-data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('air-quality').textContent = data.air_quality;
+                    document.getElementById('temperature').textContent = data.temperature;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+{% endblock %}
