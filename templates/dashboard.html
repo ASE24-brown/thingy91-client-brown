@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Device Dashboard</h1>
+
+    <div>
+        <h2>All Sensor Data</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>App ID</th>
+                    <th>Data</th>
+                    <th>Message Type</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="sensor-data-table">
+                <!-- Data will be populated here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        fetch('http://localhost:5050/api/frontend-sensor-data')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('sensor-data-table');
+                tableBody.innerHTML = '';  // Clear any existing rows
+    
+                data.sensor_data.forEach(sensor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sensor.id}</td>
+                        <td>${sensor.appId}</td>
+                        <td>${sensor.data}</td>
+                        <td>${sensor.messageType}</td>
+                        <td>${sensor.timestamp}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+    
+{% endblock %}
