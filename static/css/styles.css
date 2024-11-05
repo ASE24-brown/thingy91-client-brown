@@ -1,0 +1,104 @@
+/* Light Theme Variables */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --sidebar-bg: #f8f9fa;
+    --navbar-bg: #f8f9fa;
+    --footer-bg: #f8f9fa;
+}
+
+/* Dark Theme Variables */
+.dark-theme {
+    --bg-color: #121212;
+    --text-color: #0056b3;
+    --sidebar-bg: #333333;
+    --navbar-bg: #212529;
+    --footer-bg: #212529;
+}
+
+/* Apply the variables */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.sidebar {
+    background-color: var(--sidebar-bg);
+}
+
+footer {
+    background-color: var(--footer-bg);
+    color: var(--text-color);
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.dark-theme footer {
+    background-color: var(--footer-bg);
+    color: var(--text-color);
+}
+
+/* Base Table Styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 8px;
+    border: 1px solid; /* Border will adapt in dark/light mode */
+}
+
+/* Light Mode */
+body.light-mode .table th {
+    background-color: #f0f0f0;
+    color: #333;
+    border-color: #ddd;
+}
+
+body.light-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Light gray for striped rows */
+}
+
+body.light-mode .table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff;
+}
+
+body.light-mode .table td {
+    color: #333;
+    border-color: #ddd;
+}
+
+/* Dark Mode */
+body.dark-mode .table {
+    color: #0056b3; /* Text color in dark mode */
+}
+
+body.dark-mode .table th {
+    background-color: #333;
+    color: #eee;
+    border-color: #555;
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #444;
+}
+
+body.dark-mode .table-striped tbody tr:nth-of-type(even) {
+    background-color: #333;
+}
+
+body.dark-mode .table td {
+    color: #ccc;
+    border-color: #555;
+}
+
+.btn {
+    color: #0056b3
+}
+
+.table {
+    color: #0056b3;
+}
