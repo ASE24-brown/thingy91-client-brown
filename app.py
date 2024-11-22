@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5050"}})  # Allow all origins, or specify "http://127.0.0.1:5000" if you want to restrict
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow all origins, or specify "http://127.0.0.1:5000" if you want to restrict
 
 @app.route('/')
 def index():
@@ -20,7 +20,7 @@ def dashboard():
 @app.route('/api/frontend-sensor-data')
 def frontend_sensor_data():
     try:
-        response = requests.get('http://localhost:8080/api/sensor-data')  # Call to the backend
+        response = requests.get('http://localhost:8000/api/sensor-data')  # Call to the backend
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
         return jsonify(data)
