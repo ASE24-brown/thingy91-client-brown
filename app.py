@@ -20,7 +20,7 @@ def dashboard():
 @app.route('/api/frontend-sensor-data')
 def frontend_sensor_data():
     try:
-        response = requests.get('http://localhost:8080/api/sensor-data')  # Call to the backend
+        response = requests.get('http://localhost:8000/api/sensor-data')  # Call to the backend
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
         return jsonify(data)
