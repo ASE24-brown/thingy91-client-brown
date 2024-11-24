@@ -13,21 +13,20 @@
  <div class="main">
     <div class="col-md-6 col-sm-12">
        <div class="login-form">
-          <form>
-             <div class="form-group">
+        <form method="POST" action="/login_user">
+            <div class="form-group">
                 <label>User Name</label>
-                <input type="text" class="form-control" placeholder="User Name">
-             </div>
-             <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" placeholder="Password">
-             </div>
-             <button type="submit" class="btn btn-black">Login</button>
-             <div class="form-group">
-                <a><p>Don't have an account?</p></a>
-            <a href="{{ url_for('signup') }}"><p>Sign up here</p></a>
+                <input type="text" name="username" class="form-control" placeholder="User Name" required>
             </div>
-          </form>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-black">Login</button>
+            <div class="form-group">
+                <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a></p>
+            </div>
+        </form>
        </div>
     </div>
  </div>
