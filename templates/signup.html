@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
 <div class="sidenav">
     <div class="login-main-text">
-       <h2>AlertMate<br> Login Page</h2>
-       <p>Login from here to access.</p>
+       <h2>AlertMate<br> Sign-up Page</h2>
+       <p>Register from here to access.</p>
        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="logo" style="width: 100px; height: 100px;">
     </div>
  </div>
@@ -14,6 +14,10 @@
     <div class="col-md-6 col-sm-12">
        <div class="login-form">
           <form>
+            <div class="form-group">
+                <label>Email address</label>
+                <input type="text" class="form-control" placeholder="john@doe">
+             </div>
              <div class="form-group">
                 <label>User Name</label>
                 <input type="text" class="form-control" placeholder="User Name">
@@ -22,10 +26,10 @@
                 <label>Password</label>
                 <input type="password" class="form-control" placeholder="Password">
              </div>
-             <button type="submit" class="btn btn-black">Login</button>
+             <button type="submit" class="btn btn-black">Sign-up</button>
              <div class="form-group">
-                <a><p>Don't have an account?</p></a>
-            <a href="{{ url_for('signup') }}"><p>Sign up here</p></a>
+                <a><p>Already have an account?</p></a>
+            <a href="{{ url_for('login') }}"><p>Login here</p></a>
             </div>
           </form>
        </div>
