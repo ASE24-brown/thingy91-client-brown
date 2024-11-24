@@ -17,6 +17,10 @@ def devices():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/api/frontend-sensor-data')
 def frontend_sensor_data():
     try:

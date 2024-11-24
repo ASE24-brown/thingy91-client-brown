@@ -40,6 +40,11 @@
                                 <i class="fas fa-tachometer-alt"></i> Dashboard
                             </a>
                         </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">
+                                <i class="fas fa-tachometer-alt"></i> Login
+                            </a>
+                        </li> -->
                         <li class="nav-item">
                             <button id="dark-mode-toggle" class="btn btn-transparent">
                                 <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
@@ -102,6 +107,15 @@
         });
     });
     </script>
+
+    <style>
+        /* Make the footer sticky to the bottom */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
     
 </body>
 </html>
