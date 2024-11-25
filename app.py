@@ -103,6 +103,12 @@ def login_user():
             return jsonify({"error": "Invalid credentials"}), 401
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Login failed: {e}"}), 500
+    
+@app.route('/logout', methods=['GET', 'POST'], endpoint='logout')
+def logout_user():
+    session['logged_in'] = False
+    session.clear()  # Clear all session data
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
