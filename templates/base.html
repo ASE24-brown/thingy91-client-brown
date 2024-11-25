@@ -41,13 +41,23 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a 
+                                class="nav-link" 
+                                href="#" 
+                                onclick="document.getElementById('logout-form').submit(); return false;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                            <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;"></form>
+                        </li>
+                        <li class="nav-item">
                             <button id="dark-mode-toggle" class="btn btn-transparent">
                                 <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
-                            </button>                                                       
+                            </button>
                         </li> 
                     </ul>
                 </div>
             </nav>
+            
 
             <!-- Main Content Area -->
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
@@ -102,6 +112,15 @@
         });
     });
     </script>
+
+    <style>
+        /* Make the footer sticky to the bottom */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
     
 </body>
 </html>

@@ -102,3 +102,26 @@ body.dark-mode .table td {
 .table {
     color: #0056b3;
 }
+
+/* Dark Mode Form Styling */
+body.dark-theme input.form-control {
+    background-color: #333; /* Dark background */
+    color: #eee; /* Light text */
+    border-color: #555; /* Adjust border color */
+}
+
+body.dark-theme input.form-control::placeholder {
+    color: #bbb; /* Placeholder text color */
+}
+
+body.dark-theme .btn-primary {
+    background-color: #0056b3; /* Primary button color in dark mode */
+    border-color: #0056b3;
+    color: #fff; /* Light text */
+}
+
+#input {
+    background-color: #333; /* Dark background */
+    color: #eee; /* Light text */
+    border-color: #555; /* Adjust border color */
+}
