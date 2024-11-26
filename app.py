@@ -25,7 +25,9 @@ def index():
 @app.route('/devices')
 @login_required
 def devices():
-    return render_template('devices.html')
+    return redirect("http://localhost:1880/ui", code=302)
+
+
 
 @app.route('/dashboard')
 @login_required
