@@ -30,8 +30,6 @@ def index():
 def devices():
     return redirect("http://localhost:1880/ui", code=302)
 
-
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -44,6 +42,11 @@ def login():
 @app.route('/signup')
 def signup():
     return render_template('signup.html')
+
+@app.route('/coupling')
+@login_required
+def coupling():
+    return render_template('couple_device.html')
 
 @app.route('/api/frontend-sensor-data')
 def frontend_sensor_data():
@@ -114,6 +117,37 @@ def logout_user():
     session['logged_in'] = False
     session.clear()  # Clear all session data
     return redirect(url_for('login'))
+
+@app.route('/devices/couple', methods=['GET', 'POST'])
+def couple_device():
+    if request.method == 'GET':
+        # Fetch available devices for the user
+        try:
+            response = requests.get(f"{BACKEND_URL}/devices")  # Assuming a route to fetch devices
+            response.raise_for_status()
+            devices = response.json()
+            return render_template('couple_device.html', devices=devices)
+        except requests.exceptions.RequestException as e:
+            return jsonify({"error": f"Failed to fetch devices: {e}"}), 500
+
+    if request.method == 'POST':
+        # Get user ID and selected device ID
+        user_id = session.get('user_id')  # Assuming user ID is stored in the session
+        device_id = request.form.get('device_id')
+
+        if not user_id or not device_id:
+            return jsonify({"error": "User ID and Device ID are required"}), 400
+
+        # Send coupling request to the backend
+        try:
+            response = requests.post(
+                f"{BACKEND_URL}/associate-device",
+                json={"user_id": user_id, "device_id": device_id}
+            )
+            response.raise_for_status()
+            return jsonify({"message": "Device successfully coupled"}), 200
+        except requests.exceptions.RequestException as e:
+            return jsonify({"error": f"Failed to couple device: {e}"}), 500
 
 
 if __name__ == "__main__":
