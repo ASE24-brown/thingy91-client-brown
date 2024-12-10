@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    environment:
+      LOG_LEVEL: INFO
+      BACKEND_URL: "http://app:8000"
+    networks:
+      - shared_network
+      
+
+networks:
+  shared_network:
+    external: true

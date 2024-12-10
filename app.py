@@ -5,6 +5,9 @@ import requests
 from flask import redirect, url_for, session
 import os
 
+# Get the backend URL from an environment variable, default to localhost for non-Docker usage
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session management
 CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow all origins, or specify "http://127.0.0.1:5000" if you want to restrict
@@ -45,7 +48,7 @@ def signup():
 @app.route('/api/frontend-sensor-data')
 def frontend_sensor_data():
     try:
-        response = requests.get('http://localhost:8000/api/sensor-data')  # Call to the backend
+        response = requests.get(f'{BACKEND_URL}/api/sensor-data')  # Call to the backend
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
         return jsonify(data)
@@ -67,7 +70,7 @@ def register_user():
     # Call your backend API to register the user
     try:
         response = requests.post(
-            'http://localhost:8000/register/',
+            f'{BACKEND_URL}/register/',
             json={"username": username, "email": email, "password": password}
         )
         response.raise_for_status()
@@ -89,7 +92,7 @@ def login_user():
     # Authenticate the user via the backend API
     try:
         response = requests.post(
-            'http://localhost:8000/login/',
+            f'{BACKEND_URL}/login/',
             json={"username": username, "password": password}
         )
         response.raise_for_status()
