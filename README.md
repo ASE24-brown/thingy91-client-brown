@@ -1,24 +1,72 @@
-# thingy91-client-brown
+# Nordic Thingy:91 Frontend
 
-## Python virtual environment
+Welcome! This is the Frontend repo for the Nordic Thingy:91, an easy-to-use battery-operated prototyping platform for cellular IoT. This repository is part of the project of the Brown team for the Advanced Software Engineering class in 2024.
 
-### Mac Os
-python -m venv env
-source env/bin/activate
-deactivate
+## Table of Contents
 
-### Windows
-python -m venv env
-./env/Scripts/activate
-deactivate
+- [Nordic Thingy:91 Frontend](#nordic-thingy91-frontend)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Starting with Docker](#using-docker)
+- [Starting without Docker](#without-docker)
 
-# Start the app  
-python app.py in the root directory  
+## Installation
 
-# Start the backend for login
+1. Clone the repository:
 
-# Start the Node Red for dashboard
+   ```sh
+   git clone https://github.com/ASE24-brown/thingy91-client-brown.git
+   ```
 
-## Dependencies
+2. Go inside the folder:
+   
+   ```sh
+   cd thingy91-client-brown
+   ```
 
-pip install -r requirements.txt
+## Using Docker
+
+1. Download Docker and install it if not installed
+
+   ```sh
+   https://www.docker.com/products/docker-desktop/
+   ```
+
+2. Create a shared Docker network (needed for frontend and backend communication)
+   ```sh
+   docker network create shared_network
+   ```
+
+3. Launching Docker
+   ```sh
+   docker-compose up --build
+   ```
+
+## Without Docker
+
+1. Create a virtual environment:
+   ```sh
+   python -m venv venv
+   ```
+2. Activate the newly created environment:
+   
+   On Mac OS
+   ```sh
+   source venv/bin/activate
+   ```
+
+   On Windows use
+   ```sh
+   venv\Scripts\activate
+   ```
+
+4. Install the required packages:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+5. Run in a terminal:
+
+   ```sh
+   python app.py
+   ```
