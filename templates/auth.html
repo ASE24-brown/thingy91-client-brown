@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Authentication{% endblock %}
+
+{% block content %}
+    <h1>Authentication Page</h1>
+    <p>Please log in to access your devices.</p>
+
+    <!-- Button to start the OAuth2 Authorization Code Flow -->
+    <a href="{{ authorization_url }}" class="btn btn-primary">Log In</a>
+{% endblock %}

@@ -4,6 +4,12 @@ from flask_cors import CORS
 import requests
 from flask import redirect, url_for, session
 import os
+import base64
+import hashlib
+
+CLIENT_ID = "your-client-id"
+CLIENT_SECRET = "your-client"
+AUTH_SERVER_URL = "http://localhost:8080"
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session management
@@ -27,7 +33,9 @@ def index():
 def devices():
     return redirect("http://localhost:1880/ui", code=302)
 
-
+#@app.route('/auth')
+#def auth():
+#    return render_template('auth.html')
 
 @app.route('/dashboard')
 @login_required
@@ -111,6 +119,64 @@ def logout_user():
     session['logged_in'] = False
     session.clear()  # Clear all session data
     return redirect(url_for('login'))
+
+# Function to generate a code verifier and challenge
+def generate_pkce_pair():
+    code_verifier = base64.urlsafe_b64encode(os.urandom(32)).decode('utf-8').rstrip('=')
+    code_challenge = base64.urlsafe_b64encode(
+        hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    ).decode('utf-8').rstrip('=')
+    return code_verifier, code_challenge
+
+@app.route('/auth')
+def auth():
+    # PKCE parameters
+    code_verifier, code_challenge = generate_pkce_pair()
+    session['code_verifier'] = code_verifier  # Store code verifier securely in session
+
+    # Build authorization URL
+    authorization_url = (
+        f"{AUTH_SERVER_URL}/authorize?"
+        f"client_id={CLIENT_ID}"
+        f"&redirect_uri={url_for('callback', _external=True)}"
+        f"&response_type=code"
+        f"&scope=openid profile email"
+        f"&state=random_state_string"
+        f"&code_challenge={code_challenge}"
+        f"&code_challenge_method=S256"
+    )
+    print(f"Generated authorization URL: {authorization_url}")  # Debugging
+    return render_template('auth.html', authorization_url=authorization_url)
+
+@app.route('/callback')
+def callback():
+    code = request.args.get('code')
+    state = request.args.get('state')
+    
+    # Validate state for CSRF protection
+    if state != 'random_state_string':
+        return "Invalid state parameter", 400
+
+    # Exchange authorization code for tokens
+    token_response = requests.post(
+        "{AUTH_SERVER_URL}/token",
+        data={
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': url_for('callback', _external=True),
+            'grant_type': 'authorization_code',
+            'code_verifier': session.get('code_verifier')
+        }
+    )
+
+    tokens = token_response.json()
+    access_token = tokens.get('access_token')
+    refresh_token = tokens.get('refresh_token')
+
+    # Store tokens securely (e.g., in a database or session)
+    session['access_token'] = access_token
+    return redirect(url_for('devices'))
 
 
 if __name__ == "__main__":
