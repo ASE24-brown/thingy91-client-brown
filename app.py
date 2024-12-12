@@ -3,13 +3,20 @@ from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import requests
 from flask import redirect, url_for, session
+from flask import render_template_string
 import os
 import base64
 import hashlib
 
+# Logging
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
 CLIENT_ID = "your-client-id"
 CLIENT_SECRET = "your-client"
-AUTH_SERVER_URL = "http://localhost:8080"
+AUTH_SERVER_URL = "http://localhost:8001"
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session management
@@ -106,7 +113,8 @@ def login_user():
             if token:
                 session['token'] = token  # Store the token in the session
                 session['logged_in'] = True
-                return redirect(url_for('dashboard'))
+                return redirect('/auth')
+                #return redirect(url_for('dashboard'))
             else:
                 return jsonify({"error": "Token not found"}), 401
         else:
@@ -136,7 +144,7 @@ def auth():
 
     # Build authorization URL
     authorization_url = (
-        f"{AUTH_SERVER_URL}/authorize?"
+        f"{AUTH_SERVER_URL}/oauth/authorize?"
         f"client_id={CLIENT_ID}"
         f"&redirect_uri={url_for('callback', _external=True)}"
         f"&response_type=code"
@@ -148,8 +156,81 @@ def auth():
     print(f"Generated authorization URL: {authorization_url}")  # Debugging
     return render_template('auth.html', authorization_url=authorization_url)
 
-@app.route('/callback')
+
+
+@app.route('/callback', methods=['GET'])
 def callback():
+    """
+    Handle the callback after user authorization.
+    """
+    code = request.args.get('code')
+    state = request.args.get('state')
+
+    if not code:
+        return "Authorization failed: No code provided.", 400
+
+    # Exchange the code for a token
+    token_response = requests.post(
+        'http://localhost:8001/oauth/token',  # Your OAuth server's token endpoint
+        data={
+            'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': 'your-client-id',
+            'redirect_uri': 'http://localhost:5050/callback',
+        },
+    )
+
+    if token_response.status_code == 200:
+        token_data = token_response.json()
+        # Redirect the user back to the frontend with the token
+        return redirect(f"http://localhost:5050/dashboard?access_token={token_data}")
+        return render_template_string(
+            """
+            <h1>Authorization Successful</h1>
+            <p>Access Token: {{ token }}</p>
+            <p>Refresh Token: {{ refresh_token }}</p>
+            """,
+            token=token_data.get('access_token'),
+            refresh_token=token_data.get('refresh_token'),
+        )
+    else:
+        return "Failed to exchange code for token.", 400
+
+
+
+
+authorization_codes = {}
+
+@app.route('/callback3', methods=['GET'])
+def callback3():
+    """
+    Handle the authorization callback.
+
+    :return: Success or error message.
+    """
+    code = request.args.get('code')
+    state = request.args.get('state')
+    
+    logger.info(f"Callback received: code={code}, state={state}")
+    
+    # Check if the code exists in the authorization_codes dictionary
+    if code not in authorization_codes:
+        logger.error("Invalid or expired authorization code.")
+        return "Invalid or expired authorization code.", 400
+    
+    # Optionally validate the state (if implemented)
+    # Here, you can handle state validation logic
+
+    # Retrieve stored data for the code
+    auth_code_data = authorization_codes.get(code)
+    logger.info(f"Authorization code data: {auth_code_data}")
+    
+    # Respond to the client
+    return "Authorization successful. You may now exchange the code for a token.", 200
+
+
+@app.route('/callback2')
+def callback2():
     code = request.args.get('code')
     state = request.args.get('state')
     
