@@ -5,12 +5,34 @@ import os
 BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
 
 def login():
+    """
+    Renders the login page.
+
+    Returns:
+        str: The rendered HTML for the login page.
+    """
     return render_template('login.html')
 
 def signup():
+    """
+    Renders the signup page.
+
+    Returns:
+        str: The rendered HTML for the signup page.
+    """
     return render_template('signup.html')
 
 def register_user():
+    """
+    Handles user registration by sending a POST request to the backend.
+
+    Validates user inputs and returns the signup page with an error message
+    if any required fields are missing or the registration fails.
+
+    Returns:
+        Response: Redirects to the login page on success or renders the signup
+        page with an error message on failure.
+    """
     data = request.form
     username = data.get('username')
     email = data.get('email')
@@ -30,6 +52,16 @@ def register_user():
         return render_template('signup.html', error=f"Registration failed: {e}"), 500
 
 def login_user():
+    """
+    Handles user login by sending a POST request to the backend.
+
+    Validates user inputs and saves the authentication token in the session
+    if login is successful.
+
+    Returns:
+        Response: Redirects to the index page on success or renders the login
+        page with an error message on failure.
+    """
     data = request.form
     username = data.get('username')
     password = data.get('password')
@@ -57,6 +89,12 @@ def login_user():
         return render_template('login.html', error=f"Login failed: {e}"), 500
 
 def logout_user():
+    """
+    Logs out the user by clearing the session.
+
+    Returns:
+        Response: Redirects to the login page.
+    """
     session['logged_in'] = False
     session.clear()
     return redirect(url_for('login'))

@@ -7,10 +7,24 @@ BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
 
 @login_required
 def devices():
+    """
+    Redirects users to an external devices UI dashboard.
+
+    Returns:
+        Response: A redirect response to the devices UI.
+    """
     return redirect("http://localhost:1880/ui", code=302)
 
 @login_required
 def fetch_device_statuses():
+    """
+    Fetches the status of devices from the backend.
+
+    Handles errors by returning a JSON error message.
+
+    Returns:
+        Response: JSON data containing device statuses or an error message.
+    """
     try:
         # Get device statuses from the backend (or database)
         response = requests.get(f"{BACKEND_URL}/devices/status")  # Correct endpoint
@@ -23,10 +37,25 @@ def fetch_device_statuses():
 
 @login_required
 def coupling():
+    """
+    Renders the device coupling page.
+
+    Returns:
+        str: The rendered HTML for the coupling page.
+    """
     return render_template('couple_device.html')
 
 @login_required
 def couple_device():
+    """
+    Handles device coupling for a user. Supports both GET and POST methods.
+
+    - GET: Fetches and displays details for a specific device.
+    - POST: Associates a device with a user and displays a success or error message.
+
+    Returns:
+        Response: The rendered coupling page with success or error messages.
+    """
     if request.method == 'GET':
         device_id = request.args.get('device_id')  # Get device_id from URL
         try:
