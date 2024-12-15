@@ -68,16 +68,27 @@ def couple_device():
             return render_template('couple_device.html', error=error_message)
 
     if request.method == 'POST':
-        user_id = session.get('user_id')
+        username = session.get('username')
         device_id = request.form.get('device_id')
 
-        if not user_id or not device_id:
-            error_message = "User ID and Device ID are required"
+        if not username or not device_id:
+            error_message = "Username and Device ID are required"
             return render_template('couple_device.html', error=error_message)
 
         try:
+            # Get user_id by username
+            user_response = requests.get(f"{BACKEND_URL}/users/get_id?username={username}")
+            user_response.raise_for_status()
+            user_data = user_response.json()
+            user_id = user_data.get('user_id')
+
+            if not user_id:
+                error_message = "User ID not found"
+                return render_template('couple_device.html', error=error_message)
+
+            # Associate device with user
             response = requests.post(
-                f"{BACKEND_URL}/associate-device",
+                f"{BACKEND_URL}/associate-user-to-device",
                 json={"user_id": user_id, "device_id": device_id}
             )
             response.raise_for_status()

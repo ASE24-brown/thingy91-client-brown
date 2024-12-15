@@ -80,6 +80,7 @@ def login_user():
             if token:
                 session['token'] = token
                 session['logged_in'] = True
+                session['username'] = username
                 return redirect(url_for('index'))
             else:
                 return render_template('login.html', error="Token not found"), 401
