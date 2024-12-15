@@ -69,22 +69,20 @@ def couple_device():
 
     if request.method == 'POST':
         username = session.get('username')
-        device_id = request.form.get('device_id')
+        device_id = request.json.get('device_id')  # Ensure JSON format in the request
 
         if not username or not device_id:
-            error_message = "Username and Device ID are required"
-            return render_template('couple_device.html', error=error_message)
+            return jsonify({"error": "Username and Device ID are required"}), 400
 
         try:
             # Get user_id by username
             user_response = requests.get(f"{BACKEND_URL}/users/get_id?username={username}")
             user_response.raise_for_status()
             user_data = user_response.json()
-            user_id = user_data.get('user_id')
+            user_id = user_data.get('id')
 
             if not user_id:
-                error_message = "User ID not found"
-                return render_template('couple_device.html', error=error_message)
+                return jsonify({"error": "User ID not found"}), 404
 
             # Associate device with user
             response = requests.post(
@@ -92,9 +90,8 @@ def couple_device():
                 json={"user_id": user_id, "device_id": device_id}
             )
             response.raise_for_status()
-            success_message = "Device successfully coupled"
-            return render_template('couple_device.html', success=success_message)
+            return jsonify({"message": "Device successfully coupled"}), 200
         except requests.exceptions.RequestException as e:
-            error_message = f"Failed to couple device: {e}"
-            return render_template('couple_device.html', error=error_message)
+            return jsonify({"error": f"Failed to couple device: {e}"}), 500
+
 

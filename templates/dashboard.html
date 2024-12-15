@@ -13,7 +13,6 @@
                     <th scope="col">ID</th>
                     <th scope="col">App ID</th>
                     <th scope="col">Data</th>
-                    <th scope="col">Message Type</th>
                     <th scope="col">Timestamp</th>
                 </tr>
             </thead>
@@ -28,21 +27,22 @@
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById('sensor-data-table');
-                tableBody.innerHTML = '';  // Clear any existing rows
-    
-                data.sensor_data.forEach(sensor => {
+                tableBody.innerHTML = ''; // Clear any existing rows
+
+                // If the response is an array, iterate directly over it
+                data.forEach(sensor => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${sensor.id}</td>
-                        <td>${sensor.appId}</td>
+                        <td>${sensor.appID}</td>
                         <td>${sensor.data}</td>
-                        <td>${sensor.messageType}</td>
-                        <td>${sensor.timestamp}</td>
+                        <td>${sensor.ts}</td>
                     `;
                     tableBody.appendChild(row);
                 });
             })
             .catch(error => console.error('Error fetching data:', error));
+
     </script>
     
 {% endblock %}
