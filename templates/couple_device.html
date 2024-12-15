@@ -28,7 +28,7 @@
                         const deviceItem = document.createElement("li");
                         deviceItem.innerHTML = `
                             Device ID: ${device.device_id}, Status: ${device.status}
-                            <button onclick="coupleDevice('${device.device_id}')" class="btn btn-primary">Couple Device</button>
+                            <button onclick="coupleDevice('${device.device_id}')" class="btn btn-primary" ${device.status === 0 ? 'disabled' : ''}>Couple Device</button>
                             <button onclick="decoupleDevice('${device.device_id}')" class="btn btn-danger">Decouple Device</button>
                         `;
                         deviceList.appendChild(deviceItem);
