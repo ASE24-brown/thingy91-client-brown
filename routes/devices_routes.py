@@ -93,5 +93,49 @@ def couple_device():
             return jsonify({"message": "Device successfully coupled"}), 200
         except requests.exceptions.RequestException as e:
             return jsonify({"error": f"Failed to couple device: {e}"}), 500
+        
+@login_required
+def decouple_device():
+    """
+Decouples a device from the currently logged-in user based on the provided device_id.
+
+Args:
+    None (Relies on session and request data):
+        - The username is retrieved from the session.
+        - The device_id is extracted from the incoming JSON payload.
+
+Returns:
+    Response: A JSON response indicating the result of the decoupling operation.
+              - If username or device_id is missing, returns a 400 status with an error message.
+              - If the user ID cannot be found, returns a 404 status with an error message.
+              - If the device is successfully decoupled, returns a 200 status with a success message.
+              - If an exception occurs during the process, returns a 500 status with an error message.
+"""
+    if request.method == 'POST':
+        username = session.get('username')
+        device_id = request.json.get('device_id')  # Ensure JSON format in the request
+
+        if not username or not device_id:
+            return jsonify({"error": "Username and Device ID are required"}), 400
+
+        try:
+            # Get user_id by username
+            user_response = requests.get(f"{BACKEND_URL}/users/get_id?username={username}")
+            user_response.raise_for_status()
+            user_data = user_response.json()
+            user_id = user_data.get('id')
+
+            if not user_id:
+                return jsonify({"error": "User ID not found"}), 404
+
+            # Associate device with user
+            response = requests.post(
+                f"{BACKEND_URL}/disassociate-device-from-user",
+                json={"user_id": user_id, "device_id": device_id}
+            )
+            response.raise_for_status()
+            return jsonify({"message": "Device successfully decoupled"}), 200
+        except requests.exceptions.RequestException as e:
+            return jsonify({"error": f"Failed to decouple device: {e}"}), 500
 
 

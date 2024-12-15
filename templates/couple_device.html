@@ -29,6 +29,7 @@
                         deviceItem.innerHTML = `
                             Device ID: ${device.device_id}, Status: ${device.status}
                             <button onclick="coupleDevice('${device.device_id}')" class="btn btn-primary">Couple Device</button>
+                            <button onclick="decoupleDevice('${device.device_id}')" class="btn btn-danger">Decouple Device</button>
                         `;
                         deviceList.appendChild(deviceItem);
                     });
@@ -58,6 +59,7 @@
         .then(data => {
             if (data.message) {
                 alert(data.message);
+                fetchDeviceStatuses(); // Refresh the device list
             } else if (data.error) {
                 alert(data.error);
             }
@@ -65,6 +67,30 @@
         .catch(error => {
             console.error("Error coupling device:", error);
             alert("An error occurred while coupling the device");
+        });
+    }
+
+    // Function to decouple a device
+    function decoupleDevice(deviceId) {
+        fetch("/devices/decouple", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ device_id: deviceId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                fetchDeviceStatuses(); // Refresh the device list
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error decoupling device:", error);
+            alert("An error occurred while decoupling the device");
         });
     }
 

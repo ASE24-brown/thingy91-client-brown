@@ -91,11 +91,33 @@ def login_user():
 
 def logout_user():
     """
-    Logs out the user by clearing the session.
+    Logs out the user by clearing the session and decoupling any associated device.
 
     Returns:
         Response: Redirects to the login page.
     """
+    username = session.get('username')
+    if username:
+        try:
+            # Get user ID based on the username
+            user_response = requests.get(f"{BACKEND_URL}/users/get_id?username={username}")
+            user_response.raise_for_status()
+            user_data = user_response.json()
+            user_id = user_data.get('id')
+
+            if user_id:
+                # Call the decouple route to disassociate the device
+                decouple_response = requests.post(
+                    f"{BACKEND_URL}/disassociate-device-from-user",
+                    json={"user_id": user_id}
+                )
+                decouple_response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            # Log any issues but don't prevent logout
+            print(f"Error during device decoupling: {e}")
+
+    # Clear the session
     session['logged_in'] = False
     session.clear()
     return redirect(url_for('login'))
+

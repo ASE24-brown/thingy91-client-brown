@@ -1,7 +1,7 @@
 from flask import Flask
 from routes.auth_routes import login, signup, register_user, login_user, logout_user
 from routes.dashboard_routes import index, dashboard, frontend_sensor_data
-from routes.devices_routes import devices, coupling, couple_device, fetch_device_statuses
+from routes.devices_routes import devices, coupling, couple_device, fetch_device_statuses, decouple_device
 import os
 
 app = Flask(__name__)
@@ -27,6 +27,7 @@ app.add_url_rule('/devices', view_func=devices)
 app.add_url_rule('/coupling', view_func=coupling)
 app.add_url_rule('/devices/couple', view_func=couple_device, methods=['GET', 'POST'])
 app.add_url_rule('/devices/status', view_func=fetch_device_statuses, methods=['GET'])
+app.add_url_rule('/devices/decouple', view_func=decouple_device, methods=['POST'])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=True)
