@@ -41,13 +41,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'coupling' %}active{% endif %}" href="{{ url_for('coupling') }}">
+                                <i class="fas fa-tachometer-alt"></i> Couple Device
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a 
                                 class="nav-link" 
                                 href="#" 
                                 onclick="document.getElementById('logout-form').submit(); return false;">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a>
-                            <form id="logout-form" action="{{ url_for('logout') }}" method="post" style="display: none;"></form>
+                            <form id="logout-form" action="{{ url_for('logout_user') }}" method="post" style="display: none;"></form>
                         </li>
                         <li class="nav-item">
                             <button id="dark-mode-toggle" class="btn btn-transparent">

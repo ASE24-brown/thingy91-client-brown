@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Coupling Page{% endblock %}
+{% block content %}
+<h2>Couple a Device</h2>
+    
+{% if success %}
+    <div class="alert alert-success">{{ success }}</div>
+{% elif error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<ul id="device-list">
+    <!-- Devices will be dynamically added here -->
+</ul>
+
+<script>
+    // Function to fetch device statuses from the Flask backend
+    function fetchDeviceStatuses() {
+        fetch("/devices/status")  // Call the Flask route
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    // Successfully received device data, update the UI
+                    const deviceList = document.getElementById("device-list");
+                    deviceList.innerHTML = ''; // Clear previous list
+                    data.forEach(device => {
+                        const deviceItem = document.createElement("li");
+                        deviceItem.innerHTML = `
+                            Device ID: ${device.device_id}, Status: ${device.status}
+                            <button onclick="coupleDevice('${device.device_id}')" class="btn btn-primary" ${device.status === 0 ? 'disabled' : ''}>Couple Device</button>
+                            <button onclick="decoupleDevice('${device.device_id}')" class="btn btn-danger">Decouple Device</button>
+                        `;
+                        deviceList.appendChild(deviceItem);
+                    });
+                } else {
+                    // No devices or error in the response
+                    const deviceList = document.getElementById("device-list");
+                    deviceList.innerHTML = '<li>No devices available</li>';
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching device statuses:", error);
+                const deviceList = document.getElementById("device-list");
+                deviceList.innerHTML = '<li>An error occurred while fetching device statuses</li>';
+            });
+    }
+
+    // Function to couple a device
+    function coupleDevice(deviceId) {
+        fetch("/devices/couple", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ device_id: deviceId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                fetchDeviceStatuses(); // Refresh the device list
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error coupling device:", error);
+            alert("An error occurred while coupling the device");
+        });
+    }
+
+    // Function to decouple a device
+    function decoupleDevice(deviceId) {
+        fetch("/devices/decouple", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ device_id: deviceId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                fetchDeviceStatuses(); // Refresh the device list
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error decoupling device:", error);
+            alert("An error occurred while decoupling the device");
+        });
+    }
+
+    // Fetch device statuses on page load
+    document.addEventListener("DOMContentLoaded", fetchDeviceStatuses);
+</script>
+{% endblock %}
