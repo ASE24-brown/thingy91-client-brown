@@ -2,7 +2,7 @@ from flask import Flask
 from routes.auth_routes import login, signup, register_user, login_user, logout_user
 from routes.dashboard_routes import index, dashboard, frontend_sensor_data, influx_sensor_data
 from routes.devices_routes import devices, coupling, couple_device, fetch_device_statuses, decouple_device
-from routes.graphs_routes import graphs
+from routes.graphs_routes import graphs, graphs_data
 import os
 
 app = Flask(__name__)
@@ -32,6 +32,7 @@ app.add_url_rule('/devices/status', view_func=fetch_device_statuses, methods=['G
 app.add_url_rule('/devices/decouple', view_func=decouple_device, methods=['POST'])
 
 app.add_url_rule('/graphs', view_func=graphs)
+app.add_url_rule('/api/query', view_func=graphs_data, methods=['POST'])
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=True)

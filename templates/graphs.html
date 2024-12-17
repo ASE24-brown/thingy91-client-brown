@@ -5,12 +5,22 @@
 {% block content %}
     <h1>Live Graphs</h1>
 
-    <!-- Graph Containers -->
-    <div>
-        <h2>Temperature Data</h2>
-        <canvas id="temperatureGraph"></canvas> <!-- Placeholder for the temperature graph -->
-    </div>
+    <!-- Range Selector -->
+    <label for="rangeSelect">Select Range:</label>
+    <select id="rangeSelect">
+        <option value="-5m">Last 5 minutes</option>
+        <option value="-10m">Last 10 minutes</option>
+        <option value="-15m">Last 15 minutes</option>
+        <option value="-30m">Last 30 minutes</option>
+        <option value="-45m">Last 45 minutes</option>
+        <option value="-1h">Last 1 hour</option>
+        <option value="-3h">Last 3 hours</option>
+        <option value="-6h">Last 6 hours</option>
+        <option value="-12h">Last 12 hours</option>
+        <option value="-24h">Last 24 hours</option>
+    </select>
 
+    <!-- Graph Containers -->
     <div>
         <h2>Humidity Data</h2>
         <canvas id="humidityGraph"></canvas> <!-- Placeholder for the humidity graph -->
@@ -20,89 +30,86 @@
         <h2>Air Quality Data</h2>
         <canvas id="airQualityGraph"></canvas> <!-- Placeholder for the air quality graph -->
     </div>
+    <div>
+        <h2>CO2 Equiv Data</h2>
+        <canvas id="co2EquivGraph"></canvas> <!-- Placeholder for the co2 equiv graph -->
+    </div>
 
-    <!-- Add more graph containers as needed -->
-
-    <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
-        // Fetch data for each graph
-        const fetchDataAndPlotGraph = (graphId, fieldName) => {
-            const token = 'f_UXpTfXcFaUylrtHvxj2IDRLHeYekwyjErwRpvmZ_kaV-pdBzqfnom_0XHqUMp3WhorKpvrlypj6tcifIDKOg==';
-            const org = 'your_org_name';
-            const bucket = 'your_bucket';
+        const charts = {};
 
-            fetch(`http://localhost:8086/api/v2/query?org=${org}&bucket=${bucket}`, {
+        const fetchDataAndPlotGraph = (graphId, fieldName, range) => {
+            fetch(`/api/query`, {  // Call the new Flask route
                 method: 'POST',
                 headers: {
-                    'Authorization': `Token ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    query: `
-                    from(bucket: "${bucket}")
-                    |> range(start: -1h)
-                    |> filter(fn: (r) => r._measurement == "sensor_data")
-                    |> filter(fn: (r) => r.appId == "${fieldName}")
-                    |> filter(fn: (r) => r._field == "data")
-                    |> yield(name: "mean")
-                    `
+                    fieldName: fieldName,
+                    range: range
                 })
             })
             .then(response => response.json())
             .then(data => {
-                if (data.length === 0) {
-                    console.error('No data returned from InfluxDB');
-                    return;
+                if (!Array.isArray(data) || data.length === 0) {
+                    throw new Error('No data returned from InfluxDB or data is not an array.');
                 }
-
-                // Extracting time and value for plotting
-                const labels = data.map(item => new Date(item._time).toLocaleString());
-                const dataPoints = data.map(item => item._value);
-
-                // Plot the graph with Chart.js
-                const ctx = document.getElementById(graphId).getContext('2d');
-                new Chart(ctx, {
-                    type: 'line', // Line graph
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: `${fieldName} Data`,
-                            data: dataPoints,
-                            borderColor: 'rgb(75, 192, 192)',
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'minute',
-                                    tooltipFormat: 'll HH:mm'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Time'
-                                }
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: `${fieldName} Value`
+        
+                // Process data and plot graph
+                const labels = data.map(d => new Date(d._time).toISOString());
+                const values = data.map(d => d._value);
+        
+                if (charts[graphId]) {
+                    // Update existing chart
+                    charts[graphId].data.labels = labels;
+                    charts[graphId].data.datasets[0].data = values;
+                    charts[graphId].update();
+                } else {
+                    // Create new chart
+                    const ctx = document.getElementById(graphId).getContext('2d');
+                    charts[graphId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: fieldName,
+                                data: values,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute'
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             })
             .catch(error => console.error('Error fetching data:', error));
-        }
+        };
 
-        // Fetch data for different graphs
-        fetchDataAndPlotGraph('temperatureGraph', 'TEMP');
-        fetchDataAndPlotGraph('humidityGraph', 'HUMID');
-        fetchDataAndPlotGraph('airQualityGraph', 'AIR_QUAL');
+        const updateGraphs = () => {
+            const range = document.getElementById('rangeSelect').value;
+            fetchDataAndPlotGraph('humidityGraph', 'HUMID', range);
+            fetchDataAndPlotGraph('airQualityGraph', 'AIR_QUAL', range);
+            fetchDataAndPlotGraph('co2EquivGraph', 'CO2_EQUIV', range);
+        };
+
+        // Fetch and plot data for each graph initially
+        updateGraphs();
+
+        // Refresh data every 10 seconds
+        setInterval(updateGraphs, 10000);
+
+        // Update graphs when range changes
+        document.getElementById('rangeSelect').addEventListener('change', updateGraphs);
     </script>
 {% endblock %}
