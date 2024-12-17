@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Graphs{% endblock %}
+
+{% block content %}
+    <h1>Live Graphs</h1>
+
+    <!-- Graph Containers -->
+    <div>
+        <h2>Temperature Data</h2>
+        <canvas id="temperatureGraph"></canvas> <!-- Placeholder for the temperature graph -->
+    </div>
+
+    <div>
+        <h2>Humidity Data</h2>
+        <canvas id="humidityGraph"></canvas> <!-- Placeholder for the humidity graph -->
+    </div>
+
+    <div>
+        <h2>Air Quality Data</h2>
+        <canvas id="airQualityGraph"></canvas> <!-- Placeholder for the air quality graph -->
+    </div>
+
+    <!-- Add more graph containers as needed -->
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Fetch data for each graph
+        const fetchDataAndPlotGraph = (graphId, fieldName) => {
+            const token = 'f_UXpTfXcFaUylrtHvxj2IDRLHeYekwyjErwRpvmZ_kaV-pdBzqfnom_0XHqUMp3WhorKpvrlypj6tcifIDKOg==';
+            const org = 'your_org_name';
+            const bucket = 'your_bucket';
+
+            fetch(`http://localhost:8086/api/v2/query?org=${org}&bucket=${bucket}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: `
+                    from(bucket: "${bucket}")
+                    |> range(start: -1h)
+                    |> filter(fn: (r) => r._measurement == "sensor_data")
+                    |> filter(fn: (r) => r.appId == "${fieldName}")
+                    |> filter(fn: (r) => r._field == "data")
+                    |> yield(name: "mean")
+                    `
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    console.error('No data returned from InfluxDB');
+                    return;
+                }
+
+                // Extracting time and value for plotting
+                const labels = data.map(item => new Date(item._time).toLocaleString());
+                const dataPoints = data.map(item => item._value);
+
+                // Plot the graph with Chart.js
+                const ctx = document.getElementById(graphId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'line', // Line graph
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${fieldName} Data`,
+                            data: dataPoints,
+                            borderColor: 'rgb(75, 192, 192)',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'minute',
+                                    tooltipFormat: 'll HH:mm'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: `${fieldName} Value`
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Fetch data for different graphs
+        fetchDataAndPlotGraph('temperatureGraph', 'TEMP');
+        fetchDataAndPlotGraph('humidityGraph', 'HUMID');
+        fetchDataAndPlotGraph('airQualityGraph', 'AIR_QUAL');
+    </script>
+{% endblock %}

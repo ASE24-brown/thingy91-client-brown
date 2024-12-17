@@ -3,25 +3,23 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h1>Device Dashboard</h1>
-
-    <div>
-        <h2>All Sensor Data</h2>
-        <table class="table table-striped" border="1">
-            <thead>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">App ID</th>
-                    <th scope="col">Data</th>
-                    <th scope="col">Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="sensor-data-table">
-                <!-- Data will be populated here by JavaScript -->
-            </tbody>
-        </table>
-    </div>
-
+<h1>Device Dashboard</h1>
+<div>
+    <h2>All Sensor Data</h2>
+    <table class="table table-striped" border="1">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">App ID</th>
+                <th scope="col">Data</th>
+                <th scope="col">Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="sensor-data-table">
+            <!-- Data will be populated here by JavaScript -->
+        </tbody>
+    </table>
+</div>
     <script>
         fetch('http://localhost:5050/api/frontend-sensor-data')
             .then(response => response.json())

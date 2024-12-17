@@ -46,6 +46,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}" href="{{ url_for('graphs') }}">
+                                <i class="fas fa-tachometer-alt"></i> Live Graphs
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a 
                                 class="nav-link" 
                                 href="#" 
