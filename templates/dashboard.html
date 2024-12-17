@@ -21,7 +21,7 @@
     </table>
 </div>
     <script>
-        fetch('http://localhost:5050/api/frontend-sensor-data')
+        fetch('/api/frontend-sensor-data')
             .then(response => response.json())
             .then(data => {
             const tableBody = document.getElementById('sensor-data-table');
