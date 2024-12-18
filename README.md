@@ -70,3 +70,13 @@ Welcome! This is the Frontend repo for the Nordic Thingy:91, an easy-to-use batt
    ```sh
    python app.py
    ```
+
+## Environment Variables
+
+This project requires certain environment variables to be set. Create a ⁠ .env ⁠ file in the root directory of the project with the following content:
+
+```properties
+CLIENT_ID=client-id
+CLIENT_SECRET=client-secret
+AUTH_SERVER_URL=http://localhost:8001
+```
