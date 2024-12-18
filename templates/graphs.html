@@ -25,11 +25,6 @@
         <h2>Humidity Data</h2>
         <canvas id="humidityGraph"></canvas> <!-- Placeholder for the humidity graph -->
     </div>
-
-    <div>
-        <h2>Air Quality Data</h2>
-        <canvas id="airQualityGraph"></canvas> <!-- Placeholder for the air quality graph -->
-    </div>
     <div>
         <h2>CO2 Equiv Data</h2>
         <canvas id="co2EquivGraph"></canvas> <!-- Placeholder for the co2 equiv graph -->
@@ -99,7 +94,6 @@
         const updateGraphs = () => {
             const range = document.getElementById('rangeSelect').value;
             fetchDataAndPlotGraph('humidityGraph', 'HUMID', range);
-            fetchDataAndPlotGraph('airQualityGraph', 'AIR_QUAL', range);
             fetchDataAndPlotGraph('co2EquivGraph', 'CO2_EQUIV', range);
         };
 
