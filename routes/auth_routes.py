@@ -1,6 +1,8 @@
-from flask import render_template, jsonify, request, redirect, url_for, session
+from flask import render_template, jsonify, request, redirect, url_for, session, render_template_string
 import requests
 import os
+import base64
+import hashlib
 
 BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
 
@@ -81,7 +83,7 @@ def login_user():
                 session['token'] = token
                 session['logged_in'] = True
                 session['username'] = username
-                return redirect(url_for('index'))
+                return redirect(url_for('auth'))
             else:
                 return render_template('login.html', error="Token not found"), 401
         else:
@@ -121,3 +123,78 @@ def logout_user():
     session.clear()
     return redirect(url_for('login'))
 
+
+CLIENT_ID = "your-client-id"
+CLIENT_SECRET = "your-client"
+AUTH_SERVER_URL = "http://localhost:8001"
+
+
+
+def generate_pkce_pair():
+    """
+    Generate a PKCE code verifier and code challenge pair.
+
+    Returns:
+        tuple: A tuple containing the code verifier and code challenge.
+    """
+    code_verifier = base64.urlsafe_b64encode(os.urandom(32)).decode('utf-8').rstrip('=')
+    code_challenge = base64.urlsafe_b64encode(
+        hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    ).decode('utf-8').rstrip('=')
+    return code_verifier, code_challenge
+
+
+def auth():
+    """
+    Initiate the OAuth authorization flow with PKCE.
+
+    Returns:
+        Response: A redirect response to the authorization URL.
+    """
+    # PKCE parameters
+    code_verifier, code_challenge = generate_pkce_pair()
+    session['code_verifier'] = code_verifier  # Store code verifier securely in session
+
+    # Build authorization URL
+    authorization_url = (
+        f"{AUTH_SERVER_URL}/oauth/authorize?"
+        f"client_id={CLIENT_ID}"
+        f"&redirect_uri={url_for('callback', _external=True)}"
+        f"&response_type=code"
+        f"&scope=openid profile email"
+        f"&state=random_state_string"
+        f"&code_challenge={code_challenge}"
+        f"&code_challenge_method=S256"
+    )
+    print(f"Generated authorization URL: {authorization_url}")  # Debugging
+    return redirect(authorization_url)
+
+def callback():
+    """
+    Handle the callback after user authorization.
+
+    Returns:
+        Response: A redirect response to the index page or an error message.
+    """
+    code = request.args.get('code')
+    token_url = "http://auth_server:8001/oauth/token"
+
+    if not code:
+        return "Authorization failed: No code provided.", 400
+
+    # Exchange the code for a token
+    token_response = requests.post(
+        token_url,  # Your OAuth server's token endpoint
+        data={
+            'grant_type': 'authorization_code',
+            'code': code,
+            'client_id': 'your-client-id',
+            'redirect_uri': 'http://localhost:5050/callback',
+        },
+    )
+
+    if token_response.status_code == 200:
+        token_data = token_response.json()
+        return redirect(url_for('index'))  
+    else:
+        return "Failed to exchange code for token.", 400
