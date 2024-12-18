@@ -3,6 +3,15 @@ import requests
 import os
 import base64
 import hashlib
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+CLIENT_ID = os.getenv("CLIENT_ID")
+# CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+AUTH_SERVER_URL = os.getenv("AUTH_SERVER_URL")
 
 BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
 
@@ -122,11 +131,6 @@ def logout_user():
     session['logged_in'] = False
     session.clear()
     return redirect(url_for('login'))
-
-
-CLIENT_ID = "your-client-id"
-CLIENT_SECRET = "your-client"
-AUTH_SERVER_URL = "http://localhost:8001"
 
 
 
